@@ -4,9 +4,10 @@ import {
   signup,
   logOut,
   getMe,
+  updateProfile,
   AccessRefreshToken,
  
-} from "../controllers/authController.js";
+} from "../controller/authController.js";
 import { verifyToken } from "../middleware/authentication.js";
 
 const authRoutes = express.Router();
@@ -16,6 +17,6 @@ authRoutes.post("/register", signup);
 authRoutes.post("/logout", verifyToken, logOut);
 authRoutes.post("/refresh", AccessRefreshToken);
 authRoutes.get("/profile", verifyToken, getMe);
-authRoutes.put("/profile", verifyToken, getMe);
+authRoutes.put("/profile", verifyToken, updateProfile);
 
 export default authRoutes;

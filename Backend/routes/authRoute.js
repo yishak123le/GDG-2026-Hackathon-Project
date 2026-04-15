@@ -17,6 +17,6 @@ authRoutes.post("/register", signup);
 authRoutes.post("/logout", verifyToken, logOut);
 authRoutes.post("/refresh", AccessRefreshToken);
 authRoutes.get("/profile", verifyToken, getMe);
-authRoutes.put("/profile", verifyToken, updateProfile);
+authRoutes.put("/updateProfile", verifyToken, updateProfile);
 
 export default authRoutes;

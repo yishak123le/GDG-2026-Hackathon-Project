@@ -8,6 +8,7 @@ dotenv.config();
 import { CLIENT_URL } from "./config/env.js";
 import authRoutes from "./routes/authRoute.js";
 import chatRoutes from "./routes/chatRoute.js";
+import paymentRoutes from "./routes/paymentRoute.js";
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.use(helmet())
 // Routes
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/chat", chatRoutes);
+app.use("/api/v1/payments", paymentRoutes);
 
 // Error handler
 app.use(errorHandler);

@@ -16,6 +16,7 @@ A marketplace and chat backend for buyers, sellers, and admins built with **Node
 - [Data Models](#-data-models)
 
 ---
+
 Dployed Link:
 https://gdg-2026-hackathon-project.onrender.com
 
@@ -50,11 +51,11 @@ Digital Kuralew is a backend service for a marketplace and chat system. The curr
 │   ├── controller/
 │   │   ├── authController.js
 │   │   └── chatController.js
-│   ├── errorHandler/
-│   │   └── errorHandler.js
+|   |   ├── paymentController.js
 │   ├── middleware/
 │   │   ├── authentication.js
 │   │   └── autherization.js
+|   |   ├── errorHandler.middleware.js
 │   ├── models/
 │   │   ├── userModel.js
 │   │   ├── refreshToken.js
@@ -122,14 +123,14 @@ https://gdg-2026-hackathon-project.onrender.com/api/v1
 
 ### Authentication
 
-| Method | Endpoint               | Description                 | Auth Required |
-| ------ | -----------------------| --------------------------- | ------------- |
-| POST   | `/auth/register`       | Register a new user         | ❌            |
-| POST   | `/auth/login`          | Login user                  | ❌            |
-| POST   | `/auth/refresh`        | Refresh access token        | ❌            |
-| GET    | `/auth/profile`        | Get current user profile    | ✅            |
-| PUT    | `/auth/updateProfile`  | Update current user profile | ✅            |
-| POST   | `/auth/logout`         | Logout current user         | ✅            |
+| Method | Endpoint              | Description                 | Auth Required |
+| ------ | --------------------- | --------------------------- | ------------- |
+| POST   | `/auth/register`      | Register a new user         | ❌            |
+| POST   | `/auth/login`         | Login user                  | ❌            |
+| POST   | `/auth/refresh`       | Refresh access token        | ❌            |
+| GET    | `/auth/profile`       | Get current user profile    | ✅            |
+| PUT    | `/auth/updateProfile` | Update current user profile | ✅            |
+| POST   | `/auth/logout`        | Logout current user         | ✅            |
 
 ### Chat
 
@@ -143,9 +144,147 @@ https://gdg-2026-hackathon-project.onrender.com/api/v1
 | PUT    | `/chat/:id/read`             | Mark message as read           | ✅            |
 | DELETE | `/chat/:id`                  | Delete a chat message          | ✅            |
 
+### Payment
+
+| Method | Endpoint               | Description               | Auth Required |
+| ------ | ---------------------- | ------------------------- | ------------- |
+| POST   | `/payments`            | Create a new payment      | ✅            |
+| GET    | `/payments`            | Get all payments for user | ✅            |
+| GET    | `/payments/:id`        | Get payment by ID         | ✅            |
+| PUT    | `/payments/:id/status` | Update payment status     | ✅            |
+
 ---
 
 ## 📝 Request & Response Examples
+
+---
+
+### 14. Create Payment
+
+**Request**
+
+```http
+POST /api/v1/payments
+Authorization: Bearer <accessToken>
+Content-Type: application/json
+
+{
+  "amount": 100.5,
+  "currency": "USD",
+  "paymentMethod": "card",
+  "description": "Order #1234",
+  "reference": "ORDER-1234-2026-04-18"
+}
+```
+
+**Response**
+
+```json
+{
+  "success": true,
+  "data": {
+    "_id": "69e0f1a879e0181efcf01999",
+    "userId": "69dfd18979e0181efcf018c6",
+    "amount": 100.5,
+    "currency": "USD",
+    "paymentMethod": "card",
+    "description": "Order #1234",
+    "reference": "ORDER-1234-2026-04-18",
+    "transactionId": "TXN-1713436800000-abc123xyz",
+    "status": "pending",
+    "createdAt": "2026-04-18T10:00:00.000Z",
+    "updatedAt": "2026-04-18T10:00:00.000Z"
+  }
+}
+```
+
+---
+
+### 15. Get User Payments
+
+**Request**
+
+```http
+GET /api/v1/payments
+Authorization: Bearer <accessToken>
+```
+
+**Response**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "_id": "69e0f1a879e0181efcf01999",
+      "amount": 100.5,
+      "currency": "USD",
+      "status": "pending",
+      "paymentMethod": "card",
+      "reference": "ORDER-1234-2026-04-18",
+      "transactionId": "TXN-1713436800000-abc123xyz",
+      "createdAt": "2026-04-18T10:00:00.000Z"
+    }
+  ]
+}
+```
+
+---
+
+### 16. Update Payment Status
+
+**Request**
+
+```http
+PUT /api/v1/payments/69e0f1a879e0181efcf01999/status
+Authorization: Bearer <accessToken>
+Content-Type: application/json
+
+{
+  "status": "completed"
+}
+```
+
+**Response**
+
+```json
+{
+  "success": true,
+  "data": {
+    "_id": "69e0f1a879e0181efcf01999",
+    "status": "completed"
+  }
+}
+```
+
+---
+
+### 17. Get Payment By ID
+
+**Request**
+
+```http
+GET /api/v1/payments/69e0f1a879e0181efcf01999
+Authorization: Bearer <accessToken>
+```
+
+**Response**
+
+```json
+{
+  "success": true,
+  "data": {
+    "_id": "69e0f1a879e0181efcf01999",
+    "amount": 100.5,
+    "currency": "USD",
+    "status": "completed",
+    "paymentMethod": "card",
+    "reference": "ORDER-1234-2026-04-18",
+    "transactionId": "TXN-1713436800000-abc123xyz",
+    "createdAt": "2026-04-18T10:00:00.000Z"
+  }
+}
+```
 
 ### 1. Register User
 
@@ -546,6 +685,22 @@ Authorization: Bearer <accessToken>
 - `createdAt`
 - `updatedAt`
 
+### Payment Model
+
+- `_id`
+- `userId`
+- `amount`
+- `currency`
+- `status` (`pending`, `processing`, `completed`, `failed`, `cancelled`)
+- `paymentMethod` (`card`, `bank_transfer`, `wallet`, `mobile_money`)
+- `transactionId`
+- `reference`
+- `description`
+- `metadata`
+- `failureReason`
+- `createdAt`
+- `updatedAt`
+
 ### Refresh Token Model
 
 - `_id`
@@ -555,4 +710,3 @@ Authorization: Bearer <accessToken>
 - `createdAt`
 
 ---
-
